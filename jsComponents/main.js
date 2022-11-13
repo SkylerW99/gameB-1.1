@@ -1,6 +1,14 @@
+import { pointInRect } from "./shape.js";
+
 let stats;
 let shared, my, guests;
 let bombSize = 20;
+
+Object.assign(window, {
+  preload,
+  setup,
+  draw,
+});
 
 function preload() {
   partyConnect(
@@ -37,7 +45,6 @@ function draw() {
   moveTank();
   if (partyIsHost()) stepGame();
   drawScene();
-
   stats.tick();
 
   // for debug
@@ -58,8 +65,8 @@ function stepBullet(b) {
   b.x += b.dX;
   b.y += b.dY;
 
-  // remove out of bounds bullets
-  if (!pointInRect(b, new Rect(0, 0, 500, 400))) {
+  // remove out of bounds bullets：shape,js
+  if (!pointInRect(b, new Rect(0, 0, 600, 400))) {
     const i = shared.bullets.indexOf(b);
     shared.bullets.splice(i, 1);
   }
@@ -118,7 +125,8 @@ function keyPressed() {
 
 function drawScene() {
   noStroke();
-  background(map_1, 0, 0, 600, 400);
+  background("#FFA140");
+  //background(map_1, 0, 0, 600, 600);
   shared.bullets.forEach(drawBullet);
   for (const p of guests) {
     if (p.tank) drawTank(p.tank);
@@ -137,16 +145,17 @@ function drawTank(tank) {
   pop();
 }
 
-//set my bomb size
+//bullet becomes bigger when players get closer
 function drawBullet(b) {
   push();
-  image(bomb_1, b.x, b.y, bombSize, bombSize);
+  //image(bomb_1, b.x, b.y, bombSize, bombSize);
+  ellipse(b.x, b.y, bombSize, bombSize);
   pop();
   for (const p of guests) {
     if (dist(my.tank.x, my.tank.y, p.tank.x, p.tank.y) < 20) {
       bombSize = 50;
     } else {
-      bombSize = 20;
+      bombSize = 30;
     }
   }
 }
