@@ -1,4 +1,6 @@
-class Rect {
+//this file sets the condition to move the bullet out of canvas
+
+export class Rect {
   constructor(l = 0, t = 0, w = 0, h = 0) {
     this.l = l;
     this.t = t;
@@ -7,13 +9,13 @@ class Rect {
   }
 }
 
-class Point {
+export class Point {
   constructor(x = 0, y = 0) {
     this.x = x;
     this.y = y;
   }
 }
 
-function pointInRect(p, r) {
+export function pointInRect(p, r) {
   return p.x > r.l && p.x < r.l + r.w && p.y > r.t && p.y < r.t + r.h;
 }
