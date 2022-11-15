@@ -57,7 +57,7 @@ function preload() {
     "main"
   );
 
-  shared = partyLoadShared("shared", { bombs: {} }); // create shared data
+  shared = partyLoadShared("shared", { bombs: [] }); // create shared data
   my = partyLoadMyShared(); // create local data of my object
   guests = partyLoadGuestShareds(); // create data of all players
 
@@ -100,6 +100,7 @@ function setup() {
       bombSize: 20,
       loadingTime: 10,
       timer: 90,
+      bombs: [],
     });
   }
   // assign local data to my object
@@ -108,7 +109,7 @@ function setup() {
     xPos: random(width),
     yPos: 300,
     direction: "left",
-    //bomb: [],
+    //bombs: [],
   });
 
   //partySetShared(my,bomb());

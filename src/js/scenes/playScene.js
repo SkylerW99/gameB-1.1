@@ -13,18 +13,20 @@ export function setup() {
 export function enter() {}
 
 export function update() {
-  for (const b of my.bomb) {
-    updateBomb(b);
+  for (const p of guests) {
+    updateBomb(p);
   }
+  updateBomb(my);
 }
 
 export function draw() {
   image(images.map, 0, 0, width, height);
 
   //shared.bombs.forEach(drawBomb);
-  for (const c of my.bomb) {
-    drawBomb(c);
+  for (const p of guests) {
+    drawBomb(p);
   }
+  drawBomb(my);
 
   // draw all players
   drawPlayers();
@@ -118,7 +120,7 @@ export function keyPressed() {
       dX: 5,
       dY: -10,
       r: 20,
-      //active: true,
+      active: true,
     });
   }
 }
@@ -137,7 +139,7 @@ function updateBomb(b) {
 }
 
 function drawBomb(b) {
-  if (!active) return;
+  if (!b.active) return;
   fill("red");
   ellipse(b.x, b.y, b.r * 2, b.r * 2);
 }
