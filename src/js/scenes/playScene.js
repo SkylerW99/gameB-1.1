@@ -3,17 +3,6 @@ import { changeScene, scenes } from "../main.js";
 import { shared, my, guests, images, PLAYER_NUM } from "../main.js";
 
 export function setup() {
-  // my.bomb = {
-  //   active: false,
-  //   xPos: 0, // initial position of bomb
-  //   yPos: 0,
-  //   dX: 0, // velocity of bomb
-  //   dY: 0,
-  //   r: 20,
-
-  //   //floor: 0,
-  // };
-
   assignPosition();
   assignPlayers();
 
@@ -21,28 +10,21 @@ export function setup() {
   partySubscribe("createBullet", onCreateBullet);
 }
 
-export function enter() {
-  //   my.bomb.yPos = 100;
-  //   my.bomb.dY = 0;
-}
+export function enter() {}
 
 export function update() {
-  // physics sim
-  //   my.bomb.yPos += my.bomb.dY; // momentum
-  //   my.bomb.dY += 0.5; // gravity
-  //   image(images.avatar[0].default, my.xPos, my.yPos, 30, 30);
-
-  updateBomb();
+  for (const b of my.bomb) {
+    updateBomb(b);
+  }
 }
 
 export function draw() {
   image(images.map, 0, 0, width, height);
 
-  shared.bombs.forEach(drawBomb);
-
-  // for (const p of guests) {
-  //   if (p.player) drawPlayers(p.player);
-  // }
+  //shared.bombs.forEach(drawBomb);
+  for (const c of my.bomb) {
+    drawBomb(c);
+  }
 
   // draw all players
   drawPlayers();
@@ -124,31 +106,9 @@ function moveCharacter() {
     if (my.xPos < width) my.xPos++;
     my.direction = "right";
   }
-  //spin when getting hit
-  //   for (const p of shared.bombs) {
-  //     if (dist(p.xPos, p.yPos, my.bomb.xPos, my.bomb.yPos) < 15) {
-  //       my.bomb.spin = 0.4;
-  //     }
-  //   }
-  //   // gradually stop
-  //   my.bomb.spin *= 0.98;
-  //   my.bomb.angle += my.bomb.spin;
 }
 
-// function castBomb(b) {
-// 	push();
-// 	image(images.bomb, b.xPos, b.yPos, b.size, b.size);
-// 	pop();
-// 	for (const p of guests) {
-// 	  if (dist(b.xPos, b.yPos, p.bomb.xPos, p.bomb.yPos) < 20) {
-// 		b.size = 50;
-// 	  } else {
-// 		b.size = 20;
-// 	  }
-// 	}
-//   }
-
-//emit bomb
+//emit bomb, initate bomb
 export function keyPressed() {
   if (keyCode === 32) {
     partyEmit("createBullet", {
@@ -163,35 +123,12 @@ export function keyPressed() {
   }
 }
 
-// function startBomb() {
-//   //how to write my pos
-
-//   my.bomb.xPos = my.xPos;
-//   my.bomb.yPos = my.yPos;
-//   my.bomb.floor = my.yPos;
-//   my.bomb.dX = 5;
-//   my.bomb.dY = -10;
-//   my.bomb.active = true;
-// }
-
-// function updateBomb(b) {
-//   if (!my.bomb.active) return;
-//   //velocity
-//   my.bomb.xPos = my.bomb.xPos + my.bomb.dX;
-//   my.bomb.yPos = my.bomb.yPos + my.bomb.dY;
-//   //gravity
-//   my.bomb.dY += 1;
-
-//   //hurts enemies
-//   my.bomb.active = false;
-
-// }
-
 function updateBomb(b) {
   //if (!active) return;
   //velocity
   b.x = b.x + b.dX;
   b.y = b.y + b.dY;
+
   //gravity
   b.dY += 1;
 
