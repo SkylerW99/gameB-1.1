@@ -16,6 +16,9 @@
 import * as titleScene from './scenes/titleScene.js';
 import * as playScene from './scenes/playScene.js';
 import * as onboardingScene from './scenes/onboardingScene.js';
+import * as winningScene from './scenes/winningScene.js';
+import * as losingScene from './scenes/losingScene.js';
+import * as scoreScene from './scenes/scoreScene.js';
 
 export let shared, my, guests;
 export let images = {};
@@ -31,6 +34,9 @@ export let scenes = {
 	title: titleScene, // Scene 1: Game Tile & Cover Page
 	onboard: onboardingScene, // Scene 2: Onboarding
 	play: playScene, // Scene 3: Main Game Page
+	win: winningScene,
+	lose: losingScene,
+	score: scoreScene,
 };
 
 // p5.js auto detects your setup() and draw() before "installing" itself but
