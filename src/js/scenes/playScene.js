@@ -1,23 +1,18 @@
-import {
-  changeScene,
-  scenes,
-  shared,
-  my,
-  guests,
-  images,
-  PLAYER_NUM,
-} from "../main.js";
+import { changeScene, scenes } from "../main.js";
+
+import { shared, my, guests, images, PLAYER_NUM } from "../main.js";
 
 export function setup() {
-  my.bomb = {
-    xPos: 200, // position of ball
-    yPos: 200,
-    dX: 0, // velocity of ball
-    dY: 0,
-    r: 20,
-    size: 20,
-    floor: 0,
-  };
+  // my.bomb = {
+  //   active: false,
+  //   xPos: 0, // initial position of bomb
+  //   yPos: 0,
+  //   dX: 0, // velocity of bomb
+  //   dY: 0,
+  //   r: 20,
+
+  //   //floor: 0,
+  // };
 
   assignPosition();
   assignPlayers();
@@ -27,32 +22,27 @@ export function setup() {
 }
 
 export function enter() {
-  my.bomb.yPos = 100;
-  my.bomb.dY = 0;
+  //   my.bomb.yPos = 100;
+  //   my.bomb.dY = 0;
 }
 
 export function update() {
   // physics sim
-  my.bomb.yPos += my.bomb.dY; // momentum
-  my.bomb.dY += 0.5; // gravity
-  // test collision
-  // if (my.bomb.yPos > height - 50) {
-  // 	my.bomb.yPos = height - 50; // eject
-  // 	my.bomb.dY = -abs(my.bomb.dY) * 0.8; // bounce
-  // 	my.bomb.dY += 1; // fudge
-  // 	if (abs(my.bomb.dY) < 1) {
-  // 		// sticky
-  // 		my.bomb.dY = 0;
-  // 	}
-  // }
-  // draw me
-  image(images.avatar[0].default, my.xPos, my.yPos, 30, 30);
+  //   my.bomb.yPos += my.bomb.dY; // momentum
+  //   my.bomb.dY += 0.5; // gravity
+  //   image(images.avatar[0].default, my.xPos, my.yPos, 30, 30);
+
+  updateBomb();
 }
 
 export function draw() {
-  background(0);
-  noStroke();
   image(images.map, 0, 0, width, height);
+
+  shared.bombs.forEach(drawBomb);
+
+  // for (const p of guests) {
+  //   if (p.player) drawPlayers(p.player);
+  // }
 
   // draw all players
   drawPlayers();
@@ -78,6 +68,7 @@ function assignPosition() {
 
 function assignPlayers() {
   let playerSum = PLAYER_NUM > guests.length ? guests.length : PLAYER_NUM;
+
   for (let i = 0; i < playerSum; i++) {
     if (!guests.find((p) => p.role === "player")) {
       // find the first observer
@@ -89,6 +80,7 @@ function assignPlayers() {
     }
   }
 }
+
 function drawPlayers() {
   let playerSum = PLAYER_NUM > guests.length ? guests.length : PLAYER_NUM;
   for (let i = 0; i < playerSum; i++) {
@@ -104,25 +96,12 @@ function drawPlayers() {
 
 /* --------------------------------- Host Code ---------------------------------- */
 
-export function onCreateBullet(b) {
+//host create bullets
+function onCreateBullet(b) {
   if (partyIsHost()) shared.bombs.push(b);
 }
 
 /* --------------------------------- Client Code ---------------------------------- */
-
-//set my bomb size
-function castBomb(b) {
-  push();
-  image(images.bomb, b.xPos, b.yPos, b.size, b.size);
-  pop();
-  for (const p of guests) {
-    if (dist(b.xPos, b.yPos, p.bomb.xPos, p.bomb.yPos) < 20) {
-      b.size = 50;
-    } else {
-      b.size = 20;
-    }
-  }
-}
 
 function moveCharacter() {
   // up: w, up arrow
@@ -146,33 +125,89 @@ function moveCharacter() {
     my.direction = "right";
   }
   //spin when getting hit
-  for (const p of shared.bombs) {
-    if (dist(p.xPos, p.yPos, my.bomb.xPos, my.bomb.yPos) < 15) {
-      my.bomb.spin = 0.4;
-    }
+  //   for (const p of shared.bombs) {
+  //     if (dist(p.xPos, p.yPos, my.bomb.xPos, my.bomb.yPos) < 15) {
+  //       my.bomb.spin = 0.4;
+  //     }
+  //   }
+  //   // gradually stop
+  //   my.bomb.spin *= 0.98;
+  //   my.bomb.angle += my.bomb.spin;
+}
+
+// function castBomb(b) {
+// 	push();
+// 	image(images.bomb, b.xPos, b.yPos, b.size, b.size);
+// 	pop();
+// 	for (const p of guests) {
+// 	  if (dist(b.xPos, b.yPos, p.bomb.xPos, p.bomb.yPos) < 20) {
+// 		b.size = 50;
+// 	  } else {
+// 		b.size = 20;
+// 	  }
+// 	}
+//   }
+
+//emit bomb
+export function keyPressed() {
+  if (keyCode === 32) {
+    partyEmit("createBullet", {
+      //start bomb here
+      x: my.xPos,
+      y: my.yPos,
+      dX: 5,
+      dY: -10,
+      r: 20,
+      //active: true,
+    });
   }
-  // gradually stop
-  my.bomb.spin *= 0.98;
-  my.bomb.angle += my.bomb.spin;
+}
+
+// function startBomb() {
+//   //how to write my pos
+
+//   my.bomb.xPos = my.xPos;
+//   my.bomb.yPos = my.yPos;
+//   my.bomb.floor = my.yPos;
+//   my.bomb.dX = 5;
+//   my.bomb.dY = -10;
+//   my.bomb.active = true;
+// }
+
+// function updateBomb(b) {
+//   if (!my.bomb.active) return;
+//   //velocity
+//   my.bomb.xPos = my.bomb.xPos + my.bomb.dX;
+//   my.bomb.yPos = my.bomb.yPos + my.bomb.dY;
+//   //gravity
+//   my.bomb.dY += 1;
+
+//   //hurts enemies
+//   my.bomb.active = false;
+
+// }
+
+function updateBomb(b) {
+  //if (!active) return;
+  //velocity
+  b.x = b.x + b.dX;
+  b.y = b.y + b.dY;
+  //gravity
+  b.dY += 1;
+
+  //hurts enemies
+  b.active = false;
+}
+
+function drawBomb(b) {
+  if (!active) return;
+  fill("red");
+  ellipse(b.x, b.y, b.r * 2, b.r * 2);
 }
 
 /* --------------------------------- Input ---------------------------------- */
 
 export function mousePressed() {
+  //call change scene at a different time
   changeScene(scenes.title);
-}
-
-export function keyPressed() {
-  if (keyCode === 32) {
-    // castBomb(my.bomb);
-    console.log("space is pressed");
-    partyEmit("createBomb", {
-      xPos: my.bomb.xPos + 1,
-      yPos: my.bomb.yPos - 1,
-      dX: sin(my.bomb.xPos) * 8,
-      dY: -cos(my.bomb.yPos) * 8,
-    });
-  }
-
-  return false;
 }
