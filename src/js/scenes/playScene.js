@@ -10,41 +10,24 @@ import {
 
 export function setup() {
 	my.bomb = {
-		xPos: 200, // position of ball
-		yPos: 200,
+		xPos: 0, // position of ball
+		yPos: 0,
 		dX: 0, // velocity of ball
 		dY: 0,
-		size: 20,
+		r: 20, // radius or
+		active: true, // if the ball is visible
+		floor: 0, // where the ball drops
+		age: 0, // length
 	};
 
 	assignPosition();
 	assignPlayers();
-
-	// hosting can change mid-game so every client subscribes, and then checks if it is host on every message
-	partySubscribe('createBullet', onCreateBullet);
 }
 
-export function enter() {
-	my.bomb.yPos = 100;
-	my.bomb.dY = 0;
-}
+export function enter() {}
 
 export function update() {
-	// physics sim
-	my.bomb.yPos += my.bomb.dY; // momentum
-	my.bomb.dY += 0.5; // gravity
-	// test collision
-	// if (my.bomb.yPos > height - 50) {
-	// 	my.bomb.yPos = height - 50; // eject
-	// 	my.bomb.dY = -abs(my.bomb.dY) * 0.8; // bounce
-	// 	my.bomb.dY += 1; // fudge
-	// 	if (abs(my.bomb.dY) < 1) {
-	// 		// sticky
-	// 		my.bomb.dY = 0;
-	// 	}
-	// }
-	// draw me
-	image(images.avatar[0].default, my.xPos, my.yPos, 30, 30);
+	updateBomb(my.bomb, my);
 }
 
 export function draw() {
@@ -52,8 +35,13 @@ export function draw() {
 	noStroke();
 	image(images.map, 0, 0, width, height);
 
+	// draw me
+	image(images.avatar[0].default, my.xPos, my.yPos, 30, 30);
+	// draw bombs
+	drawBomb(my.bomb);
 	// draw all players
 	drawPlayers();
+	// move me
 	moveCharacter();
 
 	/* ------------------------------- UI/UX ------------------------------- */
@@ -62,6 +50,59 @@ export function draw() {
 	fill('white');
 	text('play scene', 10, 20);
 	pop();
+}
+
+/* --------------------------------- Bomb ---------------------------------- */
+
+function startBomb(bomb, player) {
+	bomb.xPos = player.xPos;
+	bomb.yPos = player.yPos;
+	bomb.floor = player.yPos;
+	bomb.dX = 5;
+	bomb.dY = -10;
+	bomb.active = true;
+	bomb.age = 0;
+	console.log(bomb, player);
+}
+
+function updateBomb(bomb, player) {
+	if (!bomb.active) return;
+
+	if (player.direction == 'right') {
+		bomb.xPos += bomb.dX; // apply velocity to x
+	} else if (player.direction == 'left') {
+		bomb.xPos -= bomb.dX; // apply velocity to x
+	}
+	bomb.yPos += bomb.dY; // apply velocity to y
+	bomb.dY += 0.6; // apply gravity
+
+	// bounce off bottom of screen
+	// if (bomb.y + bomb.r > height) {
+	//   bomb.y = height - bomb.r;
+	//   bomb.dY = -abs(bomb.dY);
+	// }
+
+	if (bomb.yPos > bomb.floor) {
+		bomb.dY = -abs(bomb.dY);
+		// hurt enemies
+		// bomb.active = false;
+	}
+
+	// age bomb
+	bomb.age++;
+	if (bomb.age > 35) {
+		// hurt enemies
+		bomb.active = false;
+	}
+
+	//console.log(bomb, player);
+}
+
+function drawBomb(bomb) {
+	// render
+	if (!bomb.active) return;
+	fill('black');
+	ellipse(bomb.xPos, bomb.yPos, bomb.r, bomb.r);
 }
 
 /* --------------------------------- Player Assignment ---------------------------------- */
@@ -100,27 +141,7 @@ function drawPlayers() {
 	}
 }
 
-/* --------------------------------- Host Code ---------------------------------- */
-
-export function onCreateBullet(b) {
-	if (partyIsHost()) shared.bombs.push(b);
-}
-
-/* --------------------------------- Client Code ---------------------------------- */
-
-//set my bomb size
-function castBomb(b) {
-	push();
-	image(images.bomb, b.xPos, b.yPos, b.size, b.size);
-	pop();
-	for (const p of guests) {
-		if (dist(b.xPos, b.yPos, p.bomb.xPos, p.bomb.yPos) < 20) {
-			b.size = 50;
-		} else {
-			b.size = 20;
-		}
-	}
-}
+/* --------------------------------- Input ---------------------------------- */
 
 function moveCharacter() {
 	// up: w, up arrow
@@ -143,18 +164,7 @@ function moveCharacter() {
 		if (my.xPos < width) my.xPos++;
 		my.direction = 'right';
 	}
-	//spin when getting hit
-	for (const p of shared.bombs) {
-		if (dist(p.xPos, p.yPos, my.bomb.xPos, my.bomb.yPos) < 15) {
-			my.bomb.spin = 0.4;
-		}
-	}
-	// gradually stop
-	my.bomb.spin *= 0.98;
-	my.bomb.angle += my.bomb.spin;
 }
-
-/* --------------------------------- Input ---------------------------------- */
 
 export function mousePressed() {
 	changeScene(scenes.title);
@@ -162,15 +172,7 @@ export function mousePressed() {
 
 export function keyPressed() {
 	if (keyCode === 32) {
-		// castBomb(my.bomb);
+		startBomb(my.bomb, my);
 		console.log('space is pressed');
-		partyEmit('createBomb', {
-			xPos: my.bomb.xPos + 1,
-			yPos: my.bomb.yPos - 1,
-			dX: sin(my.bomb.xPos) * 8,
-			dY: -cos(my.bomb.yPos) * 8,
-		});
 	}
-
-	return false;
 }

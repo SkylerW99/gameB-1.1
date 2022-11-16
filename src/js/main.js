@@ -16,6 +16,9 @@
 import * as titleScene from './scenes/titleScene.js';
 import * as playScene from './scenes/playScene.js';
 import * as onboardingScene from './scenes/onboardingScene.js';
+import * as winningScene from './scenes/winningScene.js';
+import * as losingScene from './scenes/losingScene.js';
+import * as scoreScene from './scenes/scoreScene.js';
 
 export let shared, my, guests;
 export let images = {};
@@ -31,6 +34,9 @@ export let scenes = {
 	title: titleScene, // Scene 1: Game Tile & Cover Page
 	onboard: onboardingScene, // Scene 2: Onboarding
 	play: playScene, // Scene 3: Main Game Page
+	win: winningScene,
+	lose: losingScene,
+	score: scoreScene,
 };
 
 // p5.js auto detects your setup() and draw() before "installing" itself but
@@ -48,7 +54,7 @@ function preload() {
 	/* ----------------------------- p5.party setup ----------------------------- */
 	partyConnect(
 		'wss://deepstream-server-1.herokuapp.com',
-		'DDF_wk2-1112_bysimone',
+		'DDF_wk2-1115_bysimone',
 		'main'
 	);
 	shared = partyLoadShared('shared'); // create shared data
@@ -100,9 +106,10 @@ function setup() {
 	// assign local data to my object
 	partySetShared(my, {
 		role: 'observer',
-		xPos: random(width),
+		xPos: random(width / 2),
 		yPos: 300,
 		direction: 'left',
+		side: 'left',
 	});
 
 	Object.values(scenes).forEach((scene) => scene.setup?.());
