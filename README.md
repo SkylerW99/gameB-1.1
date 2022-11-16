@@ -1,2 +1,3 @@
-# gameB-1.1
-Game B: Die Die Fun
+# p5.party Foundation
+
+A project template for more complex p5.js games.
