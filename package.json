@@ -1,0 +1,13 @@
+{
+  "name": "p5party_foundation",
+  "version": "0.0.1",
+  "description": "Project template for more complex p5.party games",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Justin Bakse",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "eslint": "^8.27.0",
+    "eslint-config-p5js": "^1.1.0"
+  }
+}
