@@ -14,7 +14,7 @@ export function setup() {
 		yPos: 0,
 		dX: 0, // velocity of ball
 		dY: 0,
-		r: 20, // radius or
+		r: 20, // radius or size
 		active: true, // if the ball is visible
 		floor: 0, // where the ball drops
 		age: 0, // length

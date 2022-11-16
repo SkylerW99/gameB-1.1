@@ -5,7 +5,7 @@
  * loads the other modules, sets things up, and coordinates the main game
  * scenes.
  *
- * A major organizing prinicple of this code is that it is organized into
+ * A major organizing principle of this code is that it is organized into
  * "scenes". See sceneTemplate.js for more info.
  *
  * main.js exports a function changeScene() that scenes can use to switch to
@@ -106,7 +106,7 @@ function setup() {
 	// assign local data to my object
 	partySetShared(my, {
 		role: 'observer',
-		xPos: random(width / 2),
+		xPos: random(0, width / 2),
 		yPos: 300,
 		direction: 'left',
 		side: 'left',
