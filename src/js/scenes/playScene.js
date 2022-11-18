@@ -8,6 +8,8 @@ import {
   PLAYER_NUM,
 } from "../main.js";
 
+//import { hideButtons } from "../buttons.js";
+
 //player names
 const names = [
   "Wind",
@@ -60,6 +62,7 @@ export function draw() {
   background(0);
   noStroke();
   image(images.map, 0, 0, width, height);
+  //hideButtons();
 
   //shared.bombs.forEach(drawBomb);
   //draw names
@@ -86,6 +89,12 @@ export function draw() {
   fill("white");
   text("play scene", 10, 20);
   pop();
+
+  // for (const p of guests) {
+  //   hit(p.bomb);
+  // }
+
+  //hit(shared.bombs);
 }
 
 /* --------------------------------- Bomb ---------------------------------- */
@@ -128,9 +137,8 @@ function updateBomb(bomb, player) {
   bomb.age++;
   for (const guest of guests) {
     if (
-      bomb.age > 35
-      // bomb.age > 35 ||
-      // dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) <= 0
+      bomb.age > 40 ||
+      dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) < 0
     ) {
       // hurt enemies
       bomb.active = false;
@@ -149,7 +157,13 @@ function drawBomb(bomb) {
 
 function hit(bomb) {
   for (const guest of guests) {
-    if (dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) < 50) guest.life--;
+    if (dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) < 10) {
+      guest.life--;
+      //move the bomb out
+      bomb.xPos += width;
+      bomb.yPos += height;
+      //bomb.active = false;
+    }
   }
 }
 

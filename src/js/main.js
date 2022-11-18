@@ -121,6 +121,8 @@ function draw() {
   currentScene?.update?.();
   // draw
   currentScene?.draw?.();
+  //exit
+  currentScene?.exit?.();
 }
 
 function mousePressed() {
