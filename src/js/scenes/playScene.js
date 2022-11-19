@@ -43,7 +43,7 @@ export function setup() {
   };
 
   my.name = pick(names);
-  my.life = 10;
+  my.life = 5;
 
   assignPosition();
   assignPlayers();
@@ -88,6 +88,9 @@ export function draw() {
   fill("white");
   text("play scene", 10, 20);
   pop();
+
+  //win&lose
+  exit();
 }
 
 /* --------------------------------- Bomb ---------------------------------- */
@@ -237,12 +240,22 @@ function moveCharacter() {
 }
 
 export function mousePressed() {
-  changeScene(scenes.title);
+  //changeScene(scenes.title);
 }
 
 export function keyPressed() {
   if (keyCode === 32) {
     startBomb(my.bomb, my);
     console.log("space is pressed");
+  }
+}
+
+function exit() {
+  for (const guest of guests) {
+    if (guest.life == 0 && my.life > 0) {
+      changeScene(scenes.win);
+    } else if (guest.life > 0 && my.life == 0) {
+      changeScene(scenes.lose);
+    }
   }
 }

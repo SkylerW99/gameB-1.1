@@ -16,12 +16,11 @@
 //   startGameButton.style("border-radius", "5px");
 //   startGameButton.style("fontSize", "28px");
 //   startGameButton.style("color", "white");
-
-//   startGameButton.mousePressed(next);
 // }
 
 // export function next(a) {
-//   changeScene(a);
+//   startGameButton.mousePressed(changeScene(scenes.play));
+
 // }
 
 // export function changeButtonStyle() {

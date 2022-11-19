@@ -1,14 +1,13 @@
-import { noiseColor } from "../utilities.js";
 import { changeScene, scenes } from "../main.js";
 
-//import { startButton, next } from "../buttons.js";
+//import { startButton, nextScene } from "../buttons.js";
 
-export function setup() {
-  //next(scenes.play);
-}
+let startGameButton;
+
+export function setup() {}
 
 export function draw() {
-  background(noiseColor(millis() / 2000));
+  background(0);
 
   // draw info
   push();
@@ -23,9 +22,16 @@ export function draw() {
   textAlign(CENTER, CENTER);
   text("Die Die Fun", width * 0.5, height * 0.5);
   pop();
+
+  push();
+  textSize(30);
+  fill("white");
+  text("Press RETURN/ENTER to start.", width * 0.5 - 200, height * 0.9);
+  pop();
 }
 
-export function mousePressed() {
-  //startButton(scenes.play);
-  changeScene(scenes.play);
+export function keyPressed() {
+  if (keyCode == 13) {
+    changeScene(scenes.play);
+  }
 }
