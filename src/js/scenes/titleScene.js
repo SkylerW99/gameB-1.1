@@ -1,7 +1,5 @@
 import { changeScene, scenes } from "../main.js";
 
-//import { startButton, nextScene } from "../buttons.js";
-
 let startGameButton;
 
 export function setup() {}
