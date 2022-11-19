@@ -8,6 +8,8 @@ import {
   PLAYER_NUM,
 } from "../main.js";
 
+//import { hideButtons } from "../buttons.js";
+
 //player names
 const names = [
   "Wind",
@@ -51,15 +53,13 @@ export function enter() {}
 
 export function update() {
   updateBomb(my.bomb, my);
-
-  //hit(shared.bombs);
-  hit(my.bomb);
 }
 
 export function draw() {
   background(0);
   noStroke();
   image(images.map, 0, 0, width, height);
+  //hideButtons();
 
   //shared.bombs.forEach(drawBomb);
   //draw names
@@ -73,7 +73,9 @@ export function draw() {
   // draw me
   image(images.avatar[0].default, my.xPos, my.yPos, 30, 30);
   // draw bombs
-  drawBomb(my.bomb);
+  for (const guest of guests) {
+    drawBomb(guest.bomb);
+  }
   // draw all players
   drawPlayers();
   // move me
@@ -94,63 +96,81 @@ function startBomb(bomb, player) {
   bomb.xPos = player.xPos;
   bomb.yPos = player.yPos;
   bomb.floor = player.yPos;
-  bomb.dX = 5;
-  bomb.dY = -10;
+  //bomb.dY = -10;
   bomb.active = true;
   bomb.age = 0;
   console.log(bomb, player);
+
+  if (player.direction == "right") {
+    bomb.dX = 5;
+    bomb.dY = -10;
+  } else if (player.direction == "left") {
+    bomb.dX = -5;
+    bomb.dY = -10;
+  } else if (player.direction == "up") {
+    bomb.dX = 0;
+    bomb.dY = -10;
+  } else if (player.direction == "down") {
+    bomb.dX = 0;
+    bomb.dY = 5;
+  }
 }
 
 function updateBomb(bomb, player) {
   if (!bomb.active) return;
 
-  if (player.direction == "right") {
-    bomb.xPos += bomb.dX; // apply velocity to x
-  } else if (player.direction == "left") {
-    bomb.xPos -= bomb.dX; // apply velocity to x
-  }
+  bomb.xPos += bomb.dX;
   bomb.yPos += bomb.dY; // apply velocity to y
-  bomb.dY += 0.6; // apply gravity
+  bomb.dY += 0.6;
 
-  // bounce off bottom of screen
-  // if (bomb.y + bomb.r > height) {
-  //   bomb.y = height - bomb.r;
-  //   bomb.dY = -abs(bomb.dY);
-  // }
-
+  //different movement for different directions
   if (bomb.yPos > bomb.floor) {
-    bomb.dY = -abs(bomb.dY);
-    // hurt enemies
-    // bomb.active = false;
+    if (
+      player.direction == "left" ||
+      player.direction == "right" ||
+      player.direction == "up"
+    ) {
+      bomb.dY = -abs(bomb.dY);
+    } else if (player.direction == "down") {
+      bomb.dY -= 0.7;
+    }
   }
-
   // age bomb
   bomb.age++;
+  if (bomb.age > 35) {
+    // hurt enemies
+    bomb.active = false;
+  }
+
+  //wait for bomb to activate
+  if (bomb.age < 20) return; // return means not executing the rest of the parts
+
+  //check distance & explode when dist < 10
+  let explode = false;
   for (const guest of guests) {
-    if (
-      bomb.age > 35
-      // bomb.age > 35 ||
-      // dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) <= 0
-    ) {
-      // hurt enemies
-      bomb.active = false;
+    if (dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) < 10) {
+      explode = true;
+      break; // break means no longer execute this function once one collision is detected
+    }
+  }
+
+  //hurt everyone within dist < 20
+  //could play with the damage range here
+  if (explode) {
+    bomb.active = false;
+    for (const guest of guests) {
+      if (dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) < 20) {
+        guest.life -= 1;
+      }
     }
   }
 }
-
-//console.log(bomb, player);
 
 function drawBomb(bomb) {
   // render
   if (!bomb.active) return;
   fill("black");
   ellipse(bomb.xPos, bomb.yPos, bomb.r, bomb.r);
-}
-
-function hit(bomb) {
-  for (const guest of guests) {
-    if (dist(bomb.xPos, bomb.yPos, guest.xPos, guest.yPos) < 50) guest.life--;
-  }
 }
 
 /* --------------------------------- Player Assignment ---------------------------------- */
@@ -176,6 +196,7 @@ function assignPlayers() {
     }
   }
 }
+
 function drawPlayers() {
   let playerSum = PLAYER_NUM > guests.length ? guests.length : PLAYER_NUM;
   for (let i = 0; i < playerSum; i++) {
@@ -193,6 +214,7 @@ function drawPlayers() {
 
 function moveCharacter() {
   // up: w, up arrow
+
   if (keyIsDown(87) /*w*/ || keyIsDown(38) /*up*/) {
     if (my.yPos > 0) my.yPos--;
     my.direction = "up";
