@@ -8,8 +8,6 @@ import {
   PLAYER_NUM,
 } from "../main.js";
 
-//import { hideButtons } from "../buttons.js";
-
 //player names
 const names = [
   "Wind",
